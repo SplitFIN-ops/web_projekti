@@ -1,16 +1,25 @@
-# React + Vite
+CORE REQUIREMENTS
+Your application must:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. be built with React
 
-Currently, two official plugins are available:
+UI must use React components 
+2. have at least three different "screens" with different features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Use react-router (or an equivalent routing library) for navigation between screens ("pages")
+Each screen should have its own purpose, not repeating the same feature on different URLs 
+3. use third-party libraries for both style AND functionality
 
-## React Compiler
+4. integrate an external API
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Integrate an external API that meaningfully connects to the topic of your app
+The API must be a real REST API returning JSON data
+Use fetch and async/await
+examples to explore e.g. on https://github.com/public-apis/public-apis
+5. be deployed to GitHub Pages
 
-## Expanding the ESLint configuration
+The deployed application must be accessible via a public URL
+Try to choose a topic that is useful or interesting to you personally. The project is easier and more rewarding when you care about what you are building. (Weather apps not allowed as final project topics - used too often as a default choice). 
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+VERSION CONTROL
+Initialize a git repository for the project. Commit regularly throughout the development process. Your commit history should reflect how the project evolved step by step. The repository must be publicly accessible. Include a README.md file with clear instructions on how to run the project (e.g. how to install dependencies and how to start the development server). 
