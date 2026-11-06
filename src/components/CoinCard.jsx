@@ -1,24 +1,22 @@
-import { Link } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function CoinCard({ coin }) {
   return (
-    <Link to={`/coin/${coin.id}`}>
-    <div className="coin-card">
-      <img
-        src={coin.image}
-        alt={coin.name}
-        width="40"
-      />
+    <Card className="hover:bg-slate-100 cursor-pointer">
+      <CardHeader>
+        <CardTitle>{coin.name}</CardTitle>
+      </CardHeader>
 
-      <h3>{coin.name}</h3>
-
-      <p>${coin.current_price}</p>
-
-      <p>
-        24h: {coin.price_change_percentage_24h?.toFixed(2)}%
-      </p>
-    </div>
-    </Link>
+      <CardContent>
+        <p>${coin.current_price}</p>
+        <p>{coin.price_change_percentage_24h?.toFixed(2)}%</p>
+      </CardContent>
+    </Card>
   );
 }
 
