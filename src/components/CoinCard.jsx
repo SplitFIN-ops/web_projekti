@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,16 +8,26 @@ import {
 
 function CoinCard({ coin }) {
   return (
-    <Card className="hover:bg-slate-100 cursor-pointer">
-      <CardHeader>
-        <CardTitle>{coin.name}</CardTitle>
-      </CardHeader>
+    <Card className="hover:shadow-lg cursor-pointer">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
 
-      <CardContent>
-        <p>${coin.current_price}</p>
-        <p>{coin.price_change_percentage_24h?.toFixed(2)}%</p>
-      </CardContent>
-    </Card>
+        <img
+        src={coin.image}
+        alt={coin.name}
+        className="w-10 h-10"
+        />
+
+      <div>
+        <h3>{coin.symbol.toUpperCase()}</h3>
+
+        <p>
+          ${coin.current_price.toLocaleString()}
+        </p>
+      </div>
+    </div>
+  </CardContent>
+</Card>
   );
 }
 
