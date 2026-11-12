@@ -8,26 +8,27 @@ import {
 
 function CoinCard({ coin }) {
   return (
+  <Link to={`/coin/${coin.id}`}>
     <Card className="hover:shadow-lg cursor-pointer">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
+          <img
+            src={coin.image}
+            alt={coin.name}
+            className="w-10 h-10"
+          />
 
-        <img
-        src={coin.image}
-        alt={coin.name}
-        className="w-10 h-10"
-        />
+          <div>
+            <h3>{coin.symbol.toUpperCase()}</h3>
 
-      <div>
-        <h3>{coin.symbol.toUpperCase()}</h3>
-
-        <p>
-          ${coin.current_price.toLocaleString()}
-        </p>
-      </div>
-    </div>
-  </CardContent>
-</Card>
+            <p>
+              ${coin.current_price.toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
   );
 }
 
