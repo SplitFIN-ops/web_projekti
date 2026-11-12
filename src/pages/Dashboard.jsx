@@ -82,9 +82,16 @@ const topLoser = sortedByPerformance.at(-1);
         {topGainer?.name}
       </p>
 
-      <p className="text-green-500 text-2xl font-bold">
-        +{topGainer?.price_change_percentage_24h?.toFixed(2)}%
-      </p>
+      <p
+  className={`text-2xl font-bold ${
+    topGainer?.price_change_percentage_24h >= 0
+      ? "text-green-500"
+      : "text-red-500"
+  }`}
+>
+  {topGainer?.price_change_percentage_24h >= 0 ? "+" : ""}
+  {topGainer?.price_change_percentage_24h?.toFixed(2)}%
+  </p>
     </CardContent>
   </Card>
 
@@ -98,14 +105,23 @@ const topLoser = sortedByPerformance.at(-1);
         {topLoser?.name}
       </p>
 
-      <p className="text-red-500 text-2xl font-bold">
-        {topLoser?.price_change_percentage_24h?.toFixed(2)}%
-      </p>
+      <p
+  className={`text-2xl font-bold ${
+    topLoser?.price_change_percentage_24h >= 0
+      ? "text-green-500"
+      : "text-red-500"
+  }`}
+>
+  {topLoser?.price_change_percentage_24h >= 0 ? "+" : ""}
+  {topLoser?.price_change_percentage_24h?.toFixed(2)}%
+    </p>
     </CardContent>
   </Card>
 </div>
 
       <div className="h-2"/>
+
+
       {/* MARKET MOVERS */}
       <div className="mt-8">
       <Card>
@@ -123,13 +139,16 @@ const topLoser = sortedByPerformance.at(-1);
                 {coin.name}
               </span>
 
-              <span className="text-green-500 font-semibold">
-                +
-                {coin.price_change_percentage_24h?.toFixed(
-                  2
-                )}
-                %
-              </span>
+              <span
+              className={`font-semibold ${
+              coin.price_change_percentage_24h >= 0
+              ? "text-green-500"
+              : "text-red-500"
+              }`}
+            >
+            {coin.price_change_percentage_24h >= 0 ? "+" : ""}
+            {coin.price_change_percentage_24h?.toFixed(2)}%
+            </span>
             </div>
           ))}
         </CardContent>
