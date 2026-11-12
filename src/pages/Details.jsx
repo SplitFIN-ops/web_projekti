@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getCoinHistory } from "../api/coingecko";
 import PriceChart from "../components/PriceChart";
+import {
+  getCoinDetails,
+  getCoinHistory,
+} from "../api/coingecko";
 
-import { getCoinDetails } from "../api/coingecko";
 
 function Details() {
   const { id } = useParams();

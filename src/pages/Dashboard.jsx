@@ -49,15 +49,7 @@ const topGainer = sortedByPerformance[0];
 
 const topMovers = sortedByPerformance.slice(0, 5);
 
-  const topLoser = useMemo(() => {
-    if (!coins.length) return null;
-
-    return [...coins].sort(
-      (a, b) =>
-        a.price_change_percentage_24h -
-        b.price_change_percentage_24h
-    )[0];
-  }, [coins]);
+const topLoser = sortedByPerformance.at(-1);
 
   if (loading) {
     return (
