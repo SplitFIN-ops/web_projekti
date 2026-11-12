@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PriceChart from "../components/PriceChart";
+import { Button } from "@/components/ui/button";
 import {
   getCoinDetails,
   getCoinHistory,
 } from "../api/coingecko";
+import {
+  addToWatchlist,
+  getWatchlist,
+  removeFromWatchlist,
+} from "../lib/watchlist";
 
 
 function Details() {
@@ -13,9 +19,13 @@ function Details() {
   const [coin, setCoin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     loadCoin();
+    setSaved(
+    getWatchlist().includes(id)
+  );
   }, [id]);
 
   async function loadCoin() {
@@ -72,6 +82,22 @@ if (!coin) {
           </p>
         </div>
       </div>
+
+      <Button
+        onClick={() => {
+        if (saved) {
+          removeFromWatchlist(id);
+          setSaved(false);
+        } else {
+          addToWatchlist(id);
+          setSaved(true);
+        }
+      }}
+    >
+      {saved
+        ? "Remove from Watchlist"
+        : "Add to Watchlist"}
+    </Button>
 
       <div className="space-y-3">
         <p>
