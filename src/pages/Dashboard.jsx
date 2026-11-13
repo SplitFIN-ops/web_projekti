@@ -47,7 +47,16 @@ function Dashboard() {
 
 const topGainer = sortedByPerformance[0];
 
-const topMovers = sortedByPerformance.slice(0, 5);
+const topMovers = coins
+  .filter(
+    (coin) => coin.price_change_percentage_24h != null
+  )
+  .sort(
+    (a, b) =>
+      b.price_change_percentage_24h -
+      a.price_change_percentage_24h
+  )
+  .slice(0, 5);
 
 const topLoser =
   sortedByPerformance[
@@ -150,7 +159,9 @@ const topLoser =
               }`}
             >
             {coin.price_change_percentage_24h >= 0 ? "+" : ""}
-            {coin.price_change_percentage_24h?.toFixed(2)}%
+            {coin.price_change_percentage_24h != null
+              ? `${coin.price_change_percentage_24h >= 0 ? "" : ""}${coin.price_change_percentage_24h.toFixed(2)}%`
+              : "N/A"}
             </span>
             </div>
           ))}

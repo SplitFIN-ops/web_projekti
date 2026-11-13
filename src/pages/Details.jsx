@@ -11,6 +11,12 @@ import {
   getWatchlist,
   removeFromWatchlist,
 } from "../lib/watchlist";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 
 function Details() {
@@ -20,43 +26,48 @@ function Details() {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-  setLoading(true);
+    setSaved(
+      getWatchlist().includes(id)
+    );
 
-  loadCoin();
-
-  setSaved(
-    getWatchlist().includes(id)
-  );
-}, [id]);
+    loadCoin();
+  }, [id]);
 
   async function loadCoin() {
   try {
+    setLoading(true);
+    setError(null);
+
     const [coinData, historyData] = await Promise.all([
-  getCoinDetails(id),
-  getCoinHistory(id),
-]);
+      getCoinDetails(id),
+      getCoinHistory(id),
+    ]);
+
     setCoin(coinData);
 
     const formattedHistory = historyData.prices.map((item) => ({
-      day: new Date(item[0]).toLocaleDateString(
-        "fi-FI",
-        {
-          day: "numeric",
-          month: "numeric",
-        }
-      ),
-      price: Number(item[1].toFixed(2)),
+      day: new Date(item[0]).toLocaleDateString("fi-FI", {
+        day: "numeric",
+        month: "numeric",
+      }),
+      price: item[1],
     }));
 
     setChartData(formattedHistory);
   } catch (error) {
     console.error(error);
+    setError("Failed to load cryptocurrency data.");
   } finally {
     setLoading(false);
   }
 }
+
+if (error) {
+    return <h2>{error}</h2>;
+  }
 
   if (loading) {
   return <h2>Loading...</h2>;
@@ -104,40 +115,89 @@ if (!coin) {
   </Button>
 </div>
 
-      <div className="space-y-3">
-        <p>
-          Current Price: $
-          {coin.market_data.current_price.usd.toLocaleString()}
-        </p>
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
 
-        <p>
-          Market Cap: $
-          {coin.market_data.market_cap.usd.toLocaleString()}
-        </p>
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Current Price
+              </p>
+              <p className="text-xl font-bold mt-1">
+                ${coin.market_data.current_price.usd.toLocaleString()}
+              </p>
+            </CardContent>
+          </Card>
 
-        <p>
-          Market Rank:
-          #{coin.market_cap_rank}
-        </p>
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Market Cap
+              </p>
+              <p className="text-xl font-bold mt-1">
+                ${coin.market_data.market_cap.usd.toLocaleString()}
+              </p>
+            </CardContent>
+          </Card>
 
-        <p>
-          All Time High: $
-          {coin.market_data.ath.usd.toLocaleString()}
-        </p>
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                Market Rank
+              </p>
+              <p className="text-xl font-bold mt-1">
+                #{coin.market_cap_rank}
+              </p>
+            </CardContent>
+          </Card>
 
-        <p>
-          24h Change:
-          {coin.market_data.price_change_percentage_24h.toFixed(2)}%
-        </p>
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                All Time High
+              </p>
+              <p className="text-xl font-bold mt-1">
+                ${coin.market_data.ath.usd.toLocaleString()}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                24h Change
+              </p>
+              <p
+                className={`text-xl font-bold mt-1 ${
+                  coin.market_data.price_change_percentage_24h >= 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {coin.market_data
+                  .price_change_percentage_24h != null
+                  ? `${coin.market_data.price_change_percentage_24h >= 0 ? "+" : ""}${coin.market_data.price_change_percentage_24h.toFixed(
+                      2
+                    )}%`
+                  : "N/A"}
+              </p>
+            </CardContent>
+          </Card>
+
+        </div>
         {chartData.length > 0 && (
-  <div className="mt-8">
-    <h2 className="text-2xl font-semibold mb-4">
-      Price History (7 Days)
-    </h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                Price History (7 Days)
+              </CardTitle>
+            </CardHeader>
 
-    <PriceChart data={chartData} />
-  </div>
-)}
+            <CardContent>
+              <PriceChart data={chartData} />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
