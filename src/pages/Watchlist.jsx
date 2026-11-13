@@ -2,15 +2,26 @@ import { useEffect, useState } from "react";
 import { getCoinColor } from "../lib/chartColors";
 import CoinCard from "../components/CoinCard";
 import WatchlistChart from "../components/WatchlistChart";
-
 import {
   getCoinDetails,
   getCoinHistory,
 } from "../api/coingecko";
 
 import { getWatchlist } from "../lib/watchlist";
-
 import { Badge } from "@/components/ui/badge";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 function Watchlist() {
   const [coins, setCoins] = useState([]);
@@ -21,6 +32,7 @@ function Watchlist() {
 
   useEffect(() => {
     async function loadWatchlist() {
+      setLoading(true);
       try {
         const watchlist = getWatchlist();
 
@@ -36,7 +48,7 @@ function Watchlist() {
 
         const historyData = await Promise.all(
           watchlist.map(async (id) => {
-            const history = await getCoinHistory(id);
+            const history = await getCoinHistory(id, days);
 
             return {
               id,
@@ -80,7 +92,7 @@ function Watchlist() {
     }
 
     loadWatchlist();
-  }, []);
+  }, [days]);
 
   function toggleCoin(id) {
     setSelectedCoins((prev) =>
@@ -106,6 +118,29 @@ function Watchlist() {
         Watchlist
       </h1>
 
+      <div className="mb-6">
+  <Tabs
+    value={days.toString()}
+    onValueChange={(value) =>
+      setDays(Number(value))
+    }
+  >
+    <TabsList>
+      <TabsTrigger value="1">
+        24H
+      </TabsTrigger>
+
+      <TabsTrigger value="7">
+        7D
+      </TabsTrigger>
+
+      <TabsTrigger value="30">
+        30D
+      </TabsTrigger>
+    </TabsList>
+  </Tabs>
+</div>
+
       {coins.length === 0 ? (
         <p>
           No cryptocurrencies in your watchlist.
@@ -113,7 +148,7 @@ function Watchlist() {
       ) : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
-            {coins.map((coin, index) => (
+            {coins.map((coin) => (
               <Badge
                 key={coin.id}
                 onClick={() => toggleCoin(coin.id)}
@@ -135,11 +170,19 @@ function Watchlist() {
             ))}
           </div>
 
-          <div className="mb-8">
-            <WatchlistChart
-              data={chartData}
-              selectedCoins={selectedCoins}
-            />
+          <div className="mb-8 max-w-5xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle>Watchlist Performance</CardTitle>
+              </CardHeader>
+
+              <CardContent>
+                <WatchlistChart
+                  data={chartData}
+                  selectedCoins={selectedCoins}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

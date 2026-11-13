@@ -22,11 +22,14 @@ function Details() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    loadCoin();
-    setSaved(
+  setLoading(true);
+
+  loadCoin();
+
+  setSaved(
     getWatchlist().includes(id)
   );
-  }, [id]);
+}, [id]);
 
   async function loadCoin() {
   try {
@@ -65,39 +68,41 @@ if (!coin) {
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-4 mb-6">
-        <img
-          src={coin.image.large}
-          alt={coin.name}
-          className="w-16 h-16"
-        />
+      <div className="flex items-center justify-between mb-6">
+  <div className="flex items-center gap-4">
+    <img
+      src={coin.image.large}
+      alt={coin.name}
+      className="w-16 h-16"
+    />
 
-        <div>
-          <h1 className="text-4xl font-bold">
-            {coin.name}
-          </h1>
+    <div>
+      <h1 className="text-4xl font-bold">
+        {coin.name}
+      </h1>
 
-          <p className="text-muted-foreground">
-            {coin.symbol.toUpperCase()}
-          </p>
-        </div>
-      </div>
+      <p className="text-muted-foreground">
+        {coin.symbol.toUpperCase()}
+      </p>
+    </div>
+  </div>
 
-      <Button
-        onClick={() => {
-        if (saved) {
-          removeFromWatchlist(id);
-          setSaved(false);
-        } else {
-          addToWatchlist(id);
-          setSaved(true);
-        }
-      }}
-    >
-      {saved
-        ? "Remove from Watchlist"
-        : "Add to Watchlist"}
-    </Button>
+  <Button
+    onClick={() => {
+      if (saved) {
+        removeFromWatchlist(id);
+        setSaved(false);
+      } else {
+        addToWatchlist(id);
+        setSaved(true);
+      }
+    }}
+  >
+    {saved
+      ? "Remove from Watchlist"
+      : "Add to Watchlist"}
+  </Button>
+</div>
 
       <div className="space-y-3">
         <p>

@@ -56,16 +56,19 @@ export async function getCoinDetails(id) {
  * Fetch the historical data of a specific coin
  */
 
-export async function getCoinHistory(id) {
-  const cacheKey = `history-${id}`;
+export async function getCoinHistory(
+  id,
+  days = 7
+) {
+  const cacheKey = `history-${id}-${days}`;
 
   if (cache[cacheKey]) {
     return cache[cacheKey];
   }
 
   const response = await fetch(
-    `${API_URL}/coins/${id}/market_chart?vs_currency=usd&days=7`
-  );
+  `${API_URL}/coins/${id}/market_chart?vs_currency=usd&days=${days}`
+);
 
   if (!response.ok) {
     throw new Error("Failed to fetch history");

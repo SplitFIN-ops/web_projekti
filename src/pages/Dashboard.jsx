@@ -49,7 +49,10 @@ const topGainer = sortedByPerformance[0];
 
 const topMovers = sortedByPerformance.slice(0, 5);
 
-const topLoser = sortedByPerformance.at(-1);
+const topLoser =
+  sortedByPerformance[
+    sortedByPerformance.length - 1
+  ];
 
   if (loading) {
     return (
@@ -122,11 +125,11 @@ const topLoser = sortedByPerformance.at(-1);
       <div className="h-2"/>
 
 
-      {/* MARKET MOVERS */}
+      {/* Best Performers */}
       <div className="mt-8">
       <Card>
         <CardHeader>
-          <CardTitle>Today's Top Movers</CardTitle>
+          <CardTitle>Best Performers (24H)</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-2">
@@ -172,12 +175,16 @@ const topLoser = sortedByPerformance.at(-1);
   </div>
 
   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {filteredCoins.slice(0, 6).map((coin) => (
-      <CoinCard
-        key={coin.id}
-        coin={coin}
-      />
-    ))}
+    {filteredCoins.length === 0 ? (
+      <p>No matching cryptocurrencies found.</p>
+    ) : (
+      filteredCoins.slice(0, 6).map((coin) => (
+        <CoinCard
+          key={coin.id}
+          coin={coin}
+        />
+      ))
+    )}
   </div>
 </div>
     </div>
