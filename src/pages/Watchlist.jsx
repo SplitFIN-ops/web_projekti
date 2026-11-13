@@ -27,8 +27,50 @@ function Watchlist() {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState([]);
+  const [performanceData, setPerformanceData] = useState([]);
   const [selectedCoins, setSelectedCoins] = useState([]);
   const [days, setDays] = useState(7);
+
+  const largestMarketCap =
+    coins.length > 0
+      ? [...coins].sort(
+          (a, b) =>
+            b.market_data.market_cap.usd -
+            a.market_data.market_cap.usd
+        )[0]
+      : null;
+
+  const bestPerformer =
+    performanceData.length > 0
+      ? [...performanceData].sort(
+          (a, b) =>
+            b.change - a.change
+        )[0]
+      : null;
+
+  const worstPerformer =
+    performanceData.length > 0
+      ? [...performanceData].sort(
+          (a, b) =>
+            a.change - b.change
+        )[0]
+      : null;
+
+  const averageChange =
+    performanceData.length > 0
+      ? performanceData.reduce(
+          (sum, coin) =>
+            sum + coin.change,
+          0
+        ) / performanceData.length
+      : 0;
+
+  function getCoinSymbol(id) {
+    return (
+      coins.find((coin) => coin.id === id)
+        ?.symbol.toUpperCase() || id
+    );
+  }
 
   useEffect(() => {
     async function loadWatchlist() {
@@ -82,6 +124,30 @@ function Watchlist() {
             mergedData.push(row);
           }
         }
+
+        const performance = historyData.map(
+          ({ id, history }) => {
+            const startPrice =
+              history.prices[0][1];
+
+            const endPrice =
+              history.prices[
+                history.prices.length - 1
+              ][1];
+
+            const change =
+              ((endPrice - startPrice) /
+                startPrice) *
+              100;
+
+            return {
+              id,
+              change,
+            };
+          }
+        );
+
+        setPerformanceData(performance);
 
         setChartData(mergedData);
       } catch (error) {
@@ -170,22 +236,117 @@ function Watchlist() {
             ))}
           </div>
 
-          <div className="mb-8 max-w-5xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle>Watchlist Performance</CardTitle>
-              </CardHeader>
+          <div className="mb-8 grid gap-4 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    Watchlist Performance
+                  </CardTitle>
+                </CardHeader>
 
-              <CardContent>
-                <WatchlistChart
-                  data={chartData}
-                  selectedCoins={selectedCoins}
-                />
-              </CardContent>
-            </Card>
+                <CardContent>
+                  {selectedCoins.length > 0 ? (
+                    <WatchlistChart
+                      data={chartData}
+                      selectedCoins={selectedCoins}
+                    />
+                  ) : (
+                    <p>
+                      Select at least one cryptocurrency.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    Watchlist Insights
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Best Performer
+                    </p>
+
+                    <p className="font-semibold">
+                      {getCoinSymbol(bestPerformer?.id)}
+                    </p>
+
+                    <p
+                      className={
+                        bestPerformer?.change >= 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }
+                    >
+                      {bestPerformer?.change >= 0 ? "+" : ""}
+                      {bestPerformer?.change.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Worst Performer
+                    </p>
+
+                    <p className="font-semibold">
+                      {getCoinSymbol(worstPerformer?.id)}
+                    </p>
+
+                    <p
+                      className={
+                        worstPerformer?.change >= 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }
+                    >
+                      {worstPerformer?.change >= 0 ? "+" : ""}
+                      {worstPerformer?.change.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Average Change
+                    </p>
+
+                    <p
+                      className={
+                        averageChange >= 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }
+                    >
+                      {averageChange >= 0 ? "+" : ""}
+                      {averageChange.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Largest Market Cap
+                    </p>
+
+                    <p className="font-semibold">
+                      {largestMarketCap?.symbol.toUpperCase()}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-xl font-semibold mb-4">
+            Tracked Cryptocurrencies
+          </h2>
+
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {coins.map((coin) => (
               <CoinCard
                 key={coin.id}
