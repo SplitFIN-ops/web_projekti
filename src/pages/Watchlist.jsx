@@ -30,6 +30,9 @@ function Watchlist() {
   const [performanceData, setPerformanceData] = useState([]);
   const [selectedCoins, setSelectedCoins] = useState([]);
   const [days, setDays] = useState(7);
+  const [error, setError] = useState(null);
+  const [allHistoryData, setAllHistoryData] =
+  useState([]);
 
   const visibleCoins =
   coins.filter((coin) =>
@@ -83,6 +86,85 @@ function Watchlist() {
   }
 
   useEffect(() => {
+    if (allHistoryData.length === 0) return;
+
+    const filteredData = allHistoryData.map(
+      (coin) => {
+        let prices = coin.history.prices;
+
+        if (days === 1) {
+          prices = prices.slice(-24);
+        } else if (days === 7) {
+          const count = Math.floor(
+            prices.length * (7 / 30)
+          );
+
+          prices = prices.slice(-count);
+        }
+
+        return {
+          ...coin,
+          history: {
+            ...coin.history,
+            prices,
+          },
+        };
+      }
+    );
+
+    const mergedData = [];
+
+    if (filteredData.length > 0) {
+      const points =
+        filteredData[0].history.prices.length;
+
+      for (let i = 0; i < points; i++) {
+        const row = {
+          day: new Date(
+            filteredData[0].history.prices[i][0]
+          ).toLocaleDateString("fi-FI", {
+            day: "numeric",
+            month: "numeric",
+          }),
+        };
+
+        filteredData.forEach((coin) => {
+          row[coin.id] = Number(
+            coin.history.prices[i][1].toFixed(2)
+          );
+        });
+
+        mergedData.push(row);
+      }
+    }
+
+    const performance = filteredData.map(
+      ({ id, history }) => {
+        const startPrice =
+          history.prices[0][1];
+
+        const endPrice =
+          history.prices[
+            history.prices.length - 1
+          ][1];
+
+        const change =
+          ((endPrice - startPrice) /
+            startPrice) *
+          100;
+
+        return {
+          id,
+          change,
+        };
+      }
+    );
+
+    setChartData(mergedData);
+    setPerformanceData(performance);
+  }, [days, allHistoryData]);
+
+  useEffect(() => {
     const watchlist = getWatchlist();
 
     setSelectedCoins(watchlist);
@@ -111,79 +193,34 @@ function Watchlist() {
   useEffect(() => {
     async function loadHistory() {
       setLoading(true);
+
       try {
         const watchlist = getWatchlist();
-        const historyData = await Promise.all(
-          watchlist.map(async (id) => {
-            const history = await getCoinHistory(id, days);
 
-            return {
-              id,
-              history,
-            };
-          })
-        );
+        const historyData =
+          await Promise.all(
+            watchlist.map(async (id) => {
+              const history =
+                await getCoinHistory(id, 30);
 
-        const mergedData = [];
+              return {
+                id,
+                history,
+              };
+            })
+          );
 
-        if (historyData.length > 0) {
-          const points =
-            historyData[0].history.prices.length;
-
-          for (let i = 0; i < points; i++) {
-            const row = {
-              day: new Date(
-                historyData[0].history.prices[i][0]
-              ).toLocaleDateString("fi-FI", {
-                day: "numeric",
-                month: "numeric",
-              }),
-            };
-
-            historyData.forEach((coin) => {
-              row[coin.id] = Number(
-                coin.history.prices[i][1].toFixed(2)
-              );
-            });
-
-            mergedData.push(row);
-          }
-        }
-
-        const performance = historyData.map(
-          ({ id, history }) => {
-            const startPrice =
-              history.prices[0][1];
-
-            const endPrice =
-              history.prices[
-                history.prices.length - 1
-              ][1];
-
-            const change =
-              ((endPrice - startPrice) /
-                startPrice) *
-              100;
-
-            return {
-              id,
-              change,
-            };
-          }
-        );
-
-        setPerformanceData(performance);
-
-        setChartData(mergedData);
+        setAllHistoryData(historyData);
       } catch (error) {
         console.error(error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
     }
 
     loadHistory();
-  }, [days]);
+  }, []);
 
   function toggleCoin(id) {
     setSelectedCoins((prev) =>
@@ -192,6 +229,16 @@ function Watchlist() {
             (coinId) => coinId !== id
           )
         : [...prev, id]
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <p className="text-red-500">
+          {error}
+        </p>
+      </div>
     );
   }
 

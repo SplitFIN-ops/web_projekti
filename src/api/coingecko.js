@@ -12,17 +12,50 @@ export async function getTopCoins() {
     return cache[cacheKey];
   }
 
+  const stored = localStorage.getItem(
+    cacheKey
+  );
+
+  if (stored) {
+    const parsed = JSON.parse(stored);
+
+    const age =
+      Date.now() - parsed.timestamp;
+
+    const maxAge =
+      5 * 60 * 1000;
+
+    if (age < maxAge) {
+      cache[cacheKey] = parsed.data;
+      return parsed.data;
+    }
+  }
+
   const response = await fetch(
     `${API_URL}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1`
   );
 
+  if (response.status === 429) {
+    throw new Error(
+      "CoinGecko API rate limit reached. Please try again in a few minutes."
+    );
+  }
+
   if (!response.ok) {
-    throw new Error("Failed to fetch coins");
+    throw new Error("Failed to fetch coin details");
   }
 
   const data = await response.json();
 
   cache[cacheKey] = data;
+
+  localStorage.setItem(
+    cacheKey,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
 
   return data;
 }
@@ -37,9 +70,34 @@ export async function getCoinDetails(id) {
     return cache[cacheKey];
   }
 
+  const stored = localStorage.getItem(
+    cacheKey
+  );
+
+  if (stored) {
+    const parsed = JSON.parse(stored);
+
+    const age =
+      Date.now() - parsed.timestamp;
+
+    const maxAge =
+      5 * 60 * 1000;
+
+    if (age < maxAge) {
+      cache[cacheKey] = parsed.data;
+      return parsed.data;
+    }
+  }
+
   const response = await fetch(
     `${API_URL}/coins/${id}`
   );
+
+  if (response.status === 429) {
+    throw new Error(
+      "CoinGecko API rate limit reached. Please try again in a few minutes."
+    );
+  }
 
   if (!response.ok) {
     throw new Error("Failed to fetch coin details");
@@ -48,6 +106,14 @@ export async function getCoinDetails(id) {
   const data = await response.json();
 
   cache[cacheKey] = data;
+
+  localStorage.setItem(
+    cacheKey,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
 
   return data;
 }
@@ -66,17 +132,49 @@ export async function getCoinHistory(
     return cache[cacheKey];
   }
 
-  const response = await fetch(
-  `${API_URL}/coins/${id}/market_chart?vs_currency=usd&days=${days}`
-);
+  const stored = localStorage.getItem(
+    cacheKey
+  );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch history");
+  if (stored) {
+    const parsed = JSON.parse(stored);
+
+    const age =
+      Date.now() - parsed.timestamp;
+
+    const maxAge =
+      5 * 60 * 1000;
+
+    if (age < maxAge) {
+      cache[cacheKey] = parsed.data;
+      return parsed.data;
+    }
   }
+
+  const response = await fetch(
+    `${API_URL}/coins/${id}/market_chart?vs_currency=usd&days=${days}`
+  );
+
+  if (response.status === 429) {
+    throw new Error(
+    "CoinGecko API rate limit reached. Please try again in a few minutes."
+    );
+    }
+    if (!response.ok) {
+    throw new Error("Failed to fetch history");
+    }
 
   const data = await response.json();
 
   cache[cacheKey] = data;
+
+  localStorage.setItem(
+    cacheKey,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
 
   return data;
 }

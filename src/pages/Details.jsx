@@ -59,15 +59,21 @@ function Details() {
     setChartData(formattedHistory);
   } catch (error) {
     console.error(error);
-    setError("Failed to load cryptocurrency data.");
+    setError(error.message);
   } finally {
     setLoading(false);
   }
 }
 
 if (error) {
-    return <h2>{error}</h2>;
-  }
+  return (
+    <div className="p-6">
+      <h2 className="text-red-500">
+        {error}
+      </h2>
+    </div>
+  );
+}
 
   if (loading) {
   return <h2>Loading...</h2>;

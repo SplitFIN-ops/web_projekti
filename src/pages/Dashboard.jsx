@@ -15,6 +15,7 @@ function Dashboard() {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
   async function loadCoins() {
@@ -23,6 +24,7 @@ function Dashboard() {
       setCoins(data);
     } catch (error) {
       console.error(error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -62,6 +64,16 @@ const topLoser =
   sortedByPerformance[
     sortedByPerformance.length - 1
   ];
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <p className="text-red-500">
+          {error}
+        </p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -158,9 +170,8 @@ const topLoser =
               : "text-red-500"
               }`}
             >
-            {coin.price_change_percentage_24h >= 0 ? "+" : ""}
             {coin.price_change_percentage_24h != null
-              ? `${coin.price_change_percentage_24h >= 0 ? "" : ""}${coin.price_change_percentage_24h.toFixed(2)}%`
+              ? `${coin.price_change_percentage_24h >= 0 ? "+" : ""}${coin.price_change_percentage_24h.toFixed(2)}%`
               : "N/A"}
             </span>
             </div>
