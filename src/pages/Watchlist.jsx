@@ -37,8 +37,8 @@ function Watchlist() {
   );
 
   const largestMarketCap =
-    coins.length > 0
-      ? [...coins].sort(
+    visibleCoins.length > 0
+      ? [...visibleCoins].sort(
           (a, b) =>
             b.market_data.market_cap.usd -
             a.market_data.market_cap.usd
