@@ -89,8 +89,7 @@ function Watchlist() {
   }, []);
 
   useEffect(() => {
-    async function loadWatchlist() {
-      setLoading(true);
+    async function loadCoins() {
       try {
         const watchlist = getWatchlist();
 
@@ -101,7 +100,19 @@ function Watchlist() {
         );
 
         setCoins(coinData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
+    loadCoins();
+  }, []);
+
+  useEffect(() => {
+    async function loadHistory() {
+      setLoading(true);
+      try {
+        const watchlist = getWatchlist();
         const historyData = await Promise.all(
           watchlist.map(async (id) => {
             const history = await getCoinHistory(id, days);
@@ -171,7 +182,7 @@ function Watchlist() {
       }
     }
 
-    loadWatchlist();
+    loadHistory();
   }, [days]);
 
   function toggleCoin(id) {
@@ -201,9 +212,11 @@ function Watchlist() {
       <div className="mb-6">
   <Tabs
     value={days.toString()}
-    onValueChange={(value) =>
-      setDays(Number(value))
-    }
+    onValueChange={(value) => {
+      if (!loading) {
+        setDays(Number(value));
+      }
+    }}
   >
     <TabsList>
       <TabsTrigger value="1">
@@ -300,7 +313,9 @@ function Watchlist() {
                       }
                     >
                       {bestPerformer?.change >= 0 ? "+" : ""}
-                      {bestPerformer?.change.toFixed(2)}%
+                      {bestPerformer
+                        ? `${bestPerformer.change.toFixed(2)}%`
+                        : "N/A"}
                     </p>
                   </div>
 
@@ -321,7 +336,9 @@ function Watchlist() {
                       }
                     >
                       {worstPerformer?.change >= 0 ? "+" : ""}
-                      {worstPerformer?.change.toFixed(2)}%
+                      {worstPerformer
+                        ? `${worstPerformer.change.toFixed(2)}%`
+                        : "N/A"}
                     </p>
                   </div>
 
@@ -348,7 +365,9 @@ function Watchlist() {
                     </p>
 
                     <p className="font-semibold">
-                      {largestMarketCap?.symbol.toUpperCase()}
+                      {largestMarketCap
+                        ? largestMarketCap.symbol.toUpperCase()
+                        : "N/A"}
                     </p>
                   </div>
                 </CardContent>
