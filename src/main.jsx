@@ -8,7 +8,5 @@ import "./styles/App.css";
 document.documentElement.classList.add("dark");
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
+  <RouterProvider router={router} />
 );
