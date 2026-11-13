@@ -31,6 +31,11 @@ function Watchlist() {
   const [selectedCoins, setSelectedCoins] = useState([]);
   const [days, setDays] = useState(7);
 
+  const visibleCoins =
+  coins.filter((coin) =>
+    selectedCoins.includes(coin.id)
+  );
+
   const largestMarketCap =
     coins.length > 0
       ? [...coins].sort(
@@ -40,29 +45,34 @@ function Watchlist() {
         )[0]
       : null;
 
+  const visiblePerformanceData =
+    performanceData.filter((coin) =>
+      selectedCoins.includes(coin.id)
+    );
+
   const bestPerformer =
-    performanceData.length > 0
-      ? [...performanceData].sort(
+    visiblePerformanceData.length > 0
+      ? [...visiblePerformanceData].sort(
           (a, b) =>
             b.change - a.change
         )[0]
       : null;
 
   const worstPerformer =
-    performanceData.length > 0
-      ? [...performanceData].sort(
+    visiblePerformanceData.length > 0
+      ? [...visiblePerformanceData].sort(
           (a, b) =>
             a.change - b.change
         )[0]
       : null;
 
   const averageChange =
-    performanceData.length > 0
-      ? performanceData.reduce(
-          (sum, coin) =>
-            sum + coin.change,
+    visiblePerformanceData.length > 0
+      ? visiblePerformanceData.reduce(
+          (sum, visibleCoins) =>
+            sum + visibleCoins.change,
           0
-        ) / performanceData.length
+        ) / visiblePerformanceData.length
       : 0;
 
   function getCoinSymbol(id) {
@@ -73,12 +83,16 @@ function Watchlist() {
   }
 
   useEffect(() => {
+    const watchlist = getWatchlist();
+
+    setSelectedCoins(watchlist);
+  }, []);
+
+  useEffect(() => {
     async function loadWatchlist() {
       setLoading(true);
       try {
         const watchlist = getWatchlist();
-
-        setSelectedCoins(watchlist);
 
         const coinData = await Promise.all(
           watchlist.map((id) =>
